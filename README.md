@@ -18,7 +18,9 @@
 
 # beyond this book
 
-* [http://blog.kaggle.com](http://blog.kaggle.com) :  winners of machine learning contests introduce their solutions
+* [http://blog.kaggle.com](http://blog.kaggle.com): winners of machine learning contests introduce their solutions
+
+* [http://mlcomp.org](http://mlcomp.org): compare machine learning on multiple datasets
 
 # notes and code comments
 
@@ -63,13 +65,18 @@
 export PATH="/Users/$(whoami)/anaconda/bin:$PATH"
 ~~~
 
-other choices:
+other options:
 
 * [enthought python](https://www.enthought.com/products/epd_free.php)
 
 * [python(x,y)](http://code.google.com/p/pythonxy/wiki/Downloads)
 
-* install Numpy, Scipy, Scikit-learn, matplotlib seperately 
+* install Numpy, Scipy, Scikit-learn, matplotlib seperately
+
+libs mentioned in some chapters
+
+* [NLTK and PyYAML](http://nltk.org/install.html) [[Chapter 03](ch_03/)] [tutorial: Python Text Processing with NLTK 2.0 Cookbook]
+
 
 # seek for help
 
