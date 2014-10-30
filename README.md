@@ -24,13 +24,13 @@
 
 # notes and code comments
 
-* [Chapter 01: introduction](ch_01/)
+* [Chapter 01: Introduction](ch_01/)
 	
 	> NumPy, SciPy
 	
 	> predicting web traffic
 	
-* [Chapter 02: classification](ch_02/)
+* [Chapter 02: Classification](ch_02/)
 
 	> underfitting and overfitting
 	
@@ -48,8 +48,19 @@
 
 * [Chapter 03: Clustering](ch_03/)
 	
+	> advantages and disadvantages of bag-of-words
+	
+	> generate feature vectors: min_df, max_df, token_pattern, normalize, remove stop-words, use word-stem, select most important words according to TF-IDF
+	
+	> clustering with K-Means
+	
+	> other approaches might improve clustering results
+	
+* [Chapter 04: Topic Model](ch_04/)
 
-# libs
+	
+
+# packages
 
 [Anaconda Python Distribution](http://continuum.io/downloads)(verified on my mac), including: 
 
