@@ -23,7 +23,7 @@ vector<pair<word,cnt>>
 	
 > max\_df (max documentary frequency)
 	
-> token_pattern (how to cut the words)
+> token_pattern (how to cut the words) 
 
 ~~~python
 from sklearn.feature_extraction.text import CountVectorizer
@@ -189,7 +189,39 @@ vectorizer = StemmedTfidfVectorizer(min_df=1, stop_words='english', charset_erro
 
 * predict new document
 	
+	> lable of new document
 	
+	~~~python
+	new_doc_vec   = vectorizer.transform([new_post])
+	new_doc_lable = km.predict(new_post_vec)[0]
+	~~~
 	
+	> similar documents
+	
+	~~~python
+	similar_indices = (km.labels_ == new_doc_lable).nonzero()[0]
+	~~~
+	
+	~~~python
+	similar = []
+	for i in similar_indices:
+		dist = scipy.linalg.norm((new_doc_vec - vectorized[i]).toarray())
+		similar.append((dist, dataset.data[i]))
+		similar = sorted(similar)
+	~~~
+	
+	> noisy analyze with TF-IDF of words in feature vector
+	
+### Other things might improve the clusting performance
+	
+* number of clusters
+	
+* max_features 
+	
+* try different initilial cluster centers
+	
+* try different similarity measurments such as : Cosine Similarity, Pearson Coefficient, Jaccard Coefficient
+
+* evaluate the result of clustering:  sklearn.metrics
 	
 	
