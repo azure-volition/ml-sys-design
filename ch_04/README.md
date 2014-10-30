@@ -10,9 +10,9 @@
 
 > topic is represented by a set of words
 
-### LDA: Latent Dirichlet Allocation
+### Train LDA Model (Latent Dirichlet Allocation)
 
-#### (1) Train LDA Model
+#### (1) Code
 
 > notice: sklearn.lda is a package of Linear Discriminant Analysis (a classification algorithm), not Latent Dirichlet Allocation
 
@@ -59,7 +59,7 @@ model = models.ldamodel.LdaModel( corpus, num_topics=100, id2word=corpus.id2word
 
 > **preprocess such remove stop-words and convert word to stem are important**
 
-### Predict topic of a new document
+### Predict topic of a new document with LDA model
 
 #### (1) Measure distance between two topic vector
 
@@ -88,3 +88,20 @@ for topic_idx in range(len(topics)):
 def closest_to( doc_id ):
 	return pairwise[doc_id].argmin()
 ~~~
+
+### Train LDA Model on large dataset
+
+> download dataset(9GB): http://dumps.wikimedia.org
+
+> build index
+
+~~~shell
+python -m gensim.scripts.make_wiki enwiki-latest-pages-articles.xml.bz2 wiki_en_output
+~~~
+
+> build model
+
+
+
+> 
+> 
