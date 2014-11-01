@@ -54,11 +54,19 @@
 	
 	> clustering with K-Means
 	
-	> other approaches might improve clustering results
+	> other approaches which might improve clustering results
 	
 * [Chapter 04: Topic Model](ch_04/)
 
+	> topic model
 	
+	> train LDA(Latent Dirichlet Allocation) model: code, parameters, representation, data preprocess, visualization of topics 
+	
+	> find closest topic of new documents
+	
+	> train LDA model on larger dataset
+
+* 
 
 # packages
 
