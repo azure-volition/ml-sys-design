@@ -48,7 +48,7 @@
 	
 	* Good answer for score > 0, bad answer for score <= 0
 
-### Train first classifion model with KNN:
+### Train the first model with KNN:
 
 * KNN usage: model training and predicting
 	
@@ -149,6 +149,8 @@
 	* problems with KNN: 
 	
 		> KNN can't learn weight of each feature
+		
+		> the more training examples, the more performance cost on predicting new example
 
 ### What's the next?
 
@@ -162,19 +164,37 @@
 	
 	* try another algorithm?
 	 
-* Analyse the situation: Bias-Variance and trade-off
+* How to analyze: Bias-Variance and trade-off
 
 	* High Bias: model is too simple (more training examples / rememove features won't help)
 	
-		> symptons: high test error, 
+		> symptons: testing-error keeps high when increasing data-set; training-error reduce to the same level of testing-error when increaing data-set, but also keeps high
 		
 		> cure: more feature, more complicated model, other algorithms
 		
 	* High Variance: model is too complicated
 	
+		> symptons: huge gap between testing-error and training-error (low training-error but hight testing-error)
+	
 		> cure: more training examples, less complicated model(e.g: larger K parameter of KNN), remove some features
 	
-		
+* Situations of pervious 5-NN model:
+
+	* High Variance: already over-fitting
+
+	* Reduce feature space: use less featurs has no effect
+
+	* Increase parameter K: can increase accuracy from 0.5765 to 0.6280 after increase K from 5 to 90, which has too much performance cost when predicting new answer
+	
+	* **Let's turn to other algorithms!**
+
+### Train the second model with Logistic Regression
+
+* A brief introduction of Logistic Regression
+
+* Train model
+
+
 
  	
 	
