@@ -89,7 +89,7 @@ def closest_to( doc_id ):
 	return pairwise[doc_id].argmin()
 ~~~
 
-### Train LDA Model on large dataset
+### Train LDA Model on larger dataset
 
 > download dataset(9GB): http://dumps.wikimedia.org
 
@@ -101,7 +101,50 @@ python -m gensim.scripts.make_wiki enwiki-latest-pages-articles.xml.bz2 wiki_en_
 
 > build model
 
+~~~python
+import logging, gensim, numpy
 
+# logging
+logging.basicConfig( format='%asctime)s: %(levelname)s: %s(message)s', level=logging.INFO)
 
-> 
-> 
+# examples
+id2word = gensim.corpora.Dictionary.load_from_text( 'wiki_en_output_wordids.txt')
+dataset = gensim.corpora.MmCorpus( 'wiki_en_output_tfidf.mm' )
+
+# train LDA model, this function will be running for several hours
+model = gensim.models.ldamodel.LdaModel( corpus=dataset, id2word=id2word, num_topics=100, update_every=1, chunksize=10000, passes=1 )
+
+# dump model to file
+model.save( 'wiki_lda.pk1' )
+
+# load model from file
+model = gensim.models.ldamodel.LdaModel.load('wiki_lda.pk1')
+
+# topics in this model
+# [[(topic_1,weight_1),(topic_2,weight_2),...], [(topic_1,weight_1),...], ... ]
+all_doc_topics = []  
+for doc in dataset:
+	all_doc_topics.append( model[doc] )
+
+# still a sparse model
+lenth_array = numpy.array( [len(t) for t in all_doc_topics] )
+print numpy.mean(length_array) #average topics number is 6.5 for all documents
+print numpy.mean(length_array<=10) #93% documents has topic number less than 10
+
+# most & least frequently appeared topics and their words
+topic_cnts = numpy.zeros(100)
+for doc_topics in all_doc_topics: 
+	for topic_idx, _ in doc_topics:
+		topic_cnts[topic_idx] += 1
+most_freq_topics_words  = model.show_topic( topic_cnts.argmax(), 64 )
+least_freq_topics_words = model.show_topic( topic_cnts.argmin(), 64 )
+~~~
+
+> still, we could use words cloud to visualize these topics with tool such as  [wordle](http://www.wordle.net)
+
+### Discussion about parameters of topic model
+
+* topic numbers
+
+* alpha
+
