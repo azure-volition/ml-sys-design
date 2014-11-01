@@ -14,11 +14,13 @@
 
 #### (1) Code
 
-> notice: sklearn.lda is a package of Linear Discriminant Analysis (a classification algorithm), not Latent Dirichlet Allocation
-
 > [http://en.wikipedia.org/wiki/Latent_Dirichlet_allocation](http://en.wikipedia.org/wiki/Latent_Dirichlet_allocation)
 
 > python package: gensim
+
+> *sklearn do not has package for Latent Dirichlet Allocation*
+
+> *sklearn.lda is a package of Linear Discriminant Analysis (a classification algorithm), not Latent Dirichlet Allocation*
 
 ~~~python
 from gensim impor corpora, models, similarities
