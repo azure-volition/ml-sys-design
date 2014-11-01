@@ -37,16 +37,43 @@ format: [(topic<sub>i</sub>, probability<sub>i</sub>),...]
 
 #### (2) Parameters
 
-> alpha (0 < &alpha; << 1), 1.0/len(corpus) by default
+* **alpha**:
 
-> normally alpha should be set to a very small value
+	> alpha (0 < &alpha; << 1), 1.0/len(corpus) by default
 
-> the larger alpha is, the more topics each document will belong to
+	> normally alpha should be set to a very small value
 
-~~~python
-model = models.ldamodel.LdaModel( corpus, num_topics=100, id2word=corpus.id2word, alpha=1.0/len(corpus) )
-~~~
+	> the larger alpha is, the more topics each document will belong to
 
+	~~~python
+	model = models.ldamodel.LdaModel( corpus, num_topics=100, id2word=corpus.id2word, alpha=1.0/len(corpus) )
+	~~~
+
+* **num_topics**:
+	
+	> generally: 
+	
+	> 20 is too small
+	
+	> 100 and 200 are good, and their is no significant difference between them  if topics are used as middle steps
+
+* automatically set num_topics using **HDP(Hierarchical Dirichlet Process)** instead **LDA(Latent Dirichlet Allocation)**
+	
+	~~~python
+	model = gensim.models.hdpmodel.HdpModel( dataset, id2word )
+	# replace LDAModel with HdpModel
+	# the section 'Train LDA Model on larger dataset' gives complete code
+	~~~
+	
+	> will cost more time than LDA
+	
+	> in HDP, topics number are not set beforehand, but automatically generated according to train examples. 
+	
+	> the more documents on hand, the more topics will be generated
+	
+	> e.g.: if we have only a small number of documents, we will get a generate topic about 'sports'; if we have more documents, we might get more detailed topics such as 'football', 'basketball', ...
+	
+	
 #### (3) Representation of a topic
 
 > e.g.:  dress military soviet president new state capt carlucci states leader stance government 
@@ -76,7 +103,7 @@ for topic_idx, topic in enumerate(topics):
 for scipy.spatial import distance
 distance_matrix = distance.squareform(distance.pdist(dense))
 
-# set diagnal element larger than enough other
+# set diagnal element larger than any other to prevent model return input document itself
 largest = distance_matrix.max()
 for topic_idx in range(len(topics)):
 	distance_matrix[topic_idx,topic_idx] = largest + 1
@@ -142,9 +169,4 @@ least_freq_topics_words = model.show_topic( topic_cnts.argmin(), 64 )
 
 > still, we could use words cloud to visualize these topics with tool such as  [wordle](http://www.wordle.net)
 
-### Discussion about parameters of topic model
-
-* topic numbers
-
-* alpha
 
