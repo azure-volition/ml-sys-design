@@ -24,13 +24,13 @@
 
 # notes and code comments
 
-* [Chapter 01: Introduction](ch_01/)
+* [Chapter 01: Getting Started with Python Machine Learning](ch_01/)
 	
 	> NumPy, SciPy
 	
 	> predicting web traffic
 	
-* [Chapter 02: Classification](ch_02/)
+* [Chapter 02: Learning How to Classify with Real-world Examples](ch_02/)
 
 	> underfitting and overfitting
 	
@@ -46,7 +46,7 @@
 	
 	> classification of Grain Data Set using 1-nearest classification
 
-* [Chapter 03: Clustering](ch_03/)
+* [Chapter 03: Clustering - Find Related Posts](ch_03/)
 	
 	> advantages and disadvantages of bag-of-words
 	
@@ -56,7 +56,7 @@
 	
 	> other approaches which might improve clustering results
 	
-* [Chapter 04: Topic Model](ch_04/)
+* [Chapter 04: Topic Modeling](ch_04/)
 
 	> topic model
 	
@@ -66,7 +66,9 @@
 	
 	> train LDA model on larger dataset
 
-* 
+* [Chapter 05: Classification - Detecting Pool Answers](ch_05/)
+
+	
 
 # packages
 
