@@ -291,7 +291,7 @@
 
 ### Dump model 
 
-* so it can be used to predict new example with training again
+* so it can be used to predict new example without training again
 	
 	~~~python
 	import pickle
