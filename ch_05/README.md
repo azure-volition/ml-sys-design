@@ -231,7 +231,7 @@
 
 ### What's the Next?
 
-> We don't need a model capable to find all correct answers. Acatual we expect the model to find correct answers accurately, but don't care about the call-back rate very much.
+* We don't need a model capable to find all correct answers. Acatual we expect the model to find correct answers accurately, but don't care about the call-back rate very much.
 
 ### Trade-off between precision and callback-rate, AUC
 
@@ -287,10 +287,12 @@
 	
 ### Remove useless features
 
-> remove feature with lower absolute-value coefficient in clf.coef_
+* remove feature with lower absolute-value coefficient in clf.coef_
 
-### Dump model for prediction in future
+### Dump model 
 
+* so it can be used to predict new example with training again
+	
 	~~~python
 	import pickle
 	pickle.dump( classifier, open("logreg.dat","w"))
