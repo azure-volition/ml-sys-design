@@ -192,9 +192,112 @@
 
 * A brief introduction of Logistic Regression
 
-* Train model
+* Default Prarmeters
 
+	~~~python
+	>>> print( LogisticRegression() )
+	LogisticRegression( C=1.0, class_weight=None, dual=False, fit_intercept=True, intercept_scaling=1, penalty=12, tol=0.0001 )
+	~~~
+	
+	C: how complicated the Logistic Regression model should be
 
+* Train model and predict new example
+
+	~~~python
+	from sklearn.linear_model import LogisticRegression
+
+	# train model
+	classifier = LogisticRegression()
+	classifier.fit(X, Y)
+
+	# model parameters trained with X,Y
+	print(numpy.exp(classifier.intercept_), numpy.exp(classifier.coef_.ravel())) # [0.09437188] [1.80094112]
+
+	# predict: P(x=val) is prebability that 'x=val' belong class 1
+	def lr_predict( classifier, X ):
+		return 1 / (1+numpy.exp( -(classifier.intercept_+classifier.coef_*X) ))
+	print( "P(x=-1)=%.2f"%(lr_predict(classifier,-1)) # P(x=-1)=0.05
+	print( "P(x= 7)=%.2f"%(lr_predict(classifier, 7)) # P(x= 7)=0.85
+	~~~
+
+* Experiment on different parameters
+	
+	Base line KNN model with K=90
+	Logistic Regression with C=0.1, 100, 10, 0.01, 1.0
+	
+	Logistic Regression with C=0.1 brings the best accuration of 0.631, with standard variance or 0.02791. But it still have a high training-error rate and high-testing error. Training-error is almostly the same with testing-error. **It is still underfitting.**
+	
+	Maybe there is too much noise in data, or maybe we didn't not select the proporate features.
+
+### What's the Next?
+
+> We don't need a model capable to find all correct answers. Acatual we expect the model to find correct answers accurately, but don't care about the call-back rate very much.
+
+### Trade-off between precision and callback-rate, AUC
+
+* Precision and callback-rate
+
+	> 
+|               | Output Positive     | Output Negative     |
+| ------------- |:--------------------| --------------------|
+| True  in Fact | True  Positive(TP)  | False Negative(FN)  |
+| False in Fact | False Positive(FP)  | True  Negative(TN)  |
+
+	> Precession = TP / (TP+FP)
+
+	> Callback-rate = TP / (TP+FN)
+
+* AUC
+
+	~~~python
+	from sklearn.metrics import precision_recall_curve
+	
+	precision, recall, thresholds = precision_recall_curve(y_test, classifier.predict(x_test)
+	~~~
+	
+	Curve: precision on different callback-rate
+	
+	AUC: area under the curve
+
+* Find the thresh-hold setting and call-back rate in AUC curve with precision larger than 80%. 
+
+	~~~python
+	threshholds = numpy.hstack(([0],thresholds[medium]))
+	idx80 = precisions>=0.8
+	print("P=%.2f R=%.2f thresh=%.2f" % (precision[idx80][0], recall[idx80][0], thresholds[idx80][0]))
+	# P=0.81 R=0.37 thresh=0.63
+	~~~
+	
+	> If we accept a recall-rate of 0.37, we can use the thresh-hold of 0.63 to get an precision larger than 0.8
+	
+* Predicate an good answer with precision larger than 0.8
+
+	~~~python
+	thresh80 = threshold[idx80][0]
+	probs_for_good = classifier.predict_proba(features_to_predict)[:,1]
+	answer_class = probs_for_good>thresh80
+	~~~
+
+* Validate : print out precision, recall with classification_report
+
+	~~~python
+	from sklearn.metrics import classification_report
+	print( classification_report(y_test, classifier.predict_proba[:,1]>0.63, target_names=['not accepted', 'accepted']))
+	~~~
+	
+### Remove useless features
+
+> remove feature with lower absolute-value coefficient in clf.coef_
+
+### Dump model for prediction in future
+
+	~~~python
+	import pickle
+	pickle.dump( classifier, open("logreg.dat","w"))
+	classifier = pickle.load(open("logreg.dat","r"))
+	~~~
+
+	
 
  	
 	
