@@ -80,10 +80,19 @@
 
 * GaussianNB: 
 
+	> assume features subject to Gaussian distribution (normal distribution)
+	
+	> e.g.: predict people's gender according to his/her height and width
+
 * MultinomialNB:
 
-* BernoulliNB: 
+	> assume features are appearence count
+	
+	> e.g.: features are word frequency or TF-IDF vector
 
+* BernoulliNB: 
+	
+	> do not count word frequency, use whether each word appears as feature
 
 ### Train Model
 
@@ -99,10 +108,75 @@
 	#POSITIVE: 482
 	~~~ 
 
-* train first model
+* data preprocess
+
+	> assumption for simplicity : ignore neutral and irrelevant (only keep positive and negative) in dataset
+
+	~~~python
+	X, Y = load_sanders_data()
+	pos_neg_idx = numpy.logical_or(Y=="positive",Y=="negative")
+	X = X[pos_neg_idx]  # selecting features
+	Y = Y[pos_neg_idx]	# selecting labels
+	Y = Y=="positive"	# 1 for positive, 0 for negative
+	~~~
+
+* pipeline TF-IDF Vectorizer and Naive Bayes Classifier
 	
+	~~~python
+	from sklearn.feature_extration.text import TfidfVectorizer
+	from sklearn.naive_bayes import MultinomialNB
+	from sklearn.pipeline import Pipeline
 	
+	# return a pipeline can be used for fit() and predict()
+	def create_ngram_model():
+		tfidf_ngrams = TfidfVectorizer(ngram_range=(1,3), analyzer="word", binary=False)
+		classifier = MultinomialNB()
+		pipeline = Pipeline( [('vect', tfidf_ngrams), ('classifier', classifier)] )
+		return pipeline
+	~~~
 	
+* function for training and cross validating
+
+	> use ShuffleSplit instead of KFold on a small example set 
+
+	> KFold splits the data-set into K fold with continuous examples. 
 	
+	> In situation when data-set is small, data-set should be shuffled before split to make sure the examples are randomly appeared 
 	
-* 
+	~~~python
+	from sklearn.metrics import precision_recall_curve, auc
+	from sklearn.cross_validation import ShuffleSplit
+	
+	def train_model( classifier_factory, X, Y):
+		# init
+		cv = ShuffleSplit(n=len(X), n_iter=10, test_size=0.3, indices=True, random_state=0)
+		test_scores    = []
+		precision_scores = []
+		
+		# train and test 		
+		for train, test in cv:
+			x_train, y_train = X[train], Y[train]
+			x_test,  y_test  = X[test],  Y[test]
+			
+			classifier = classifier_factory()
+			classifier.fit( x_train, y_train )
+			
+			train_score = classifier.score( x_train, y_train )
+			test_score  = classifier.score( x_test,  y_test  )
+			
+			test_scores.append( test_score )
+			proba = classifier.predict_proba( x_test )
+			precision, recall, pr_thresholds = precision_recall_curve( y_test, proba[:,1] )
+			precision_scores.append( auc(recall, precision) )
+		
+		# summary
+		print "%.3f\t%.3f\t%.3f\t%.3f" % (numpy.mean(scores), numpy.std(scores), numpy.mean(precision_scores), numpy.std(precision_scores))
+	~~~
+
+* combine above all together
+
+	~~~python
+	train_moel(create_ngram_model, X, Y)
+	~~~
+
+
