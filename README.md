@@ -66,8 +66,25 @@
 	
 	> train LDA model on larger dataset
 
-* [Chapter 05: Classification - Detecting Pool Answers](ch_05/)
+* [Chapter 05: Classification I - Detecting Pool Answers](ch_05/)
 
+	> data preprocess, feature selection, label representation
+	
+	> classification with KNN, evaluate and find more features, problems of KNN
+	
+	> vias and bias, analyse and find solution when error rate can not be reduced
+	
+	> classification with Logistic Regression, analyse when error rate can not be reduced
+	
+	> trade-off between precision and callback-rate, AUC
+	
+	> remove useless features according the parametered trained by Logistic Regression
+	
+	> dump model to file for future works
+
+* [Chapter 06: Classification II - Sentiment Analysis](ch_06/)
+	
+	> 
 	
 
 # packages
