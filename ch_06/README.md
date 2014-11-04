@@ -75,6 +75,8 @@
 		> log[P(C)\*P(F<sub>1</sub>|C)\*P(F<sub>2</sub>|C)] = logP(C) + logP(F<sub>1</sub>)|C) + logP(F<sub>2</sub>|C)
 	
 		> **C<sub>best</sub> = arg max<sub>c&in;C</sub>( log P(C=c) + sum( log P(F<sub>k</sub>|C=c) )**
+		
+		> lib such as [mpmath](http://code.google.com/p/mpmath/) is not fast enough
 
 ### Different kinds of Naive Bayes
 
@@ -94,7 +96,7 @@
 	
 	> do not count word frequency, use whether each word appears as feature
 
-### Train Model
+### Train model: only consider positive and negative sentiment
 
 * get Twitter data from Niek Sanders' corpus
 
@@ -177,6 +179,50 @@
 
 	~~~python
 	train_moel(create_ngram_model, X, Y)
+	# 0.805 0.024 0.878 0.016
+	# 80.5 correctness, 87.8% P/R AUC
 	~~~
 
+### Train Model: consider all sentiment
 
+* all sentiments:
+
+	~~~python
+	X,Y = load_sanders_data()
+	for c in numpy.unique(Y):
+		print("#%s: %i" % (c, sum(Y==c)))
+	#irrelevant: 543
+	#NEGATIVE: 535
+	#NEUTRAL: 2082
+	#POSITIVE: 482
+	~~~ 
+
+* lable function:
+
+	> regard all sentiment in 'pos_sent_list' as positive examples
+	
+	~~~python
+	def tweak_labels(Y, pos_sent_list):
+		pos = (Y==pos_sent_list[0])
+		for sent_label in pos_sent_list[1:]:
+			pos |= (Y==sent_label)
+		Y = numpy.zeros(Y.shape[0])
+		Y[pos] = 1
+		Y = Y.astype(int)
+		return Y
+	~~~
+
+	> label all sentiment in ['positive', 'negative'] as positive examples, all other sentiment in ['irrelevant','neutral'] as negative examples
+		
+	~~~python
+	Y = tweak_labels(Y, ["positive", "negative"])
+	~~~
+
+* train model with new labels
+
+	~~~python
+	train_model(create_ngram_model, X, Y, plot=True)
+	0.767 0.014 0.670 0.022
+	~~~
+	
+* 
