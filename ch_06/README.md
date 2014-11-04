@@ -96,7 +96,7 @@
 	
 	> do not count word frequency, use whether each word appears as feature
 
-### Train model: only consider positive and negative sentiment
+### Train Model 1: only consider positive and negative sentiment
 
 * get Twitter data from Niek Sanders' corpus
 
@@ -183,7 +183,7 @@
 	# 80.5 correctness, 87.8% P/R AUC
 	~~~
 
-### Train Model: consider all sentiment
+### Train Model 2: consider all sentiment
 
 * all sentiments:
 
@@ -225,4 +225,153 @@
 	0.767 0.014 0.670 0.022
 	~~~
 	
-* 
+* evaluation
+
+	> P/R AUC is 0.670 
+	
+	> but sent/all = (482+535)/(482+535+2082+543) = 28%, which means if we always predict sent, an AUC of 72% still can be achieved
+	
+	> **performance of this model is BAD**
+
+* lable 'positive' to 1, others('negative','irrelevant','neutral') to 0
+
+	> **performance is bad**
+
+* lable 'negative' to 1, others('positive','irrelevant','neutral') to 0
+	
+	> **performance is bad**
+
+### Improve Model 2 by trying different parameter combinations automatically
+
+* different paramters might be helpful
+	* TfidfVectorizer
+		* NGrams: (1,1) / (1,2) / (1,3)
+		* min_df: 1 / 2 
+		* IDF: user_idf = True / False ; smooth_idf = True / False
+		* stop_words
+		* log calculation on word-frequency:  sublinear_tf
+		* word_cnt or word_appearence: binary = True / False
+	* MultinominalNB 	
+		* Add-one smoothing (Laplace smoothing): alpha = 1
+		* Lidstone smoothing: alpha = 0.01 / 0.05 / 0.1 / 0.5
+		* no smoothing: alpha = 0
+
+* explore parameters automatically with ssikit-learn.GridSearchCV
+	* name dictionary key of parameter as required by GridSearchCV
+		
+		> \<estimator\>\_\_\<subestimator\>\_\_...\_\_\<param_name\>
+		
+		> e.g.: ngram_range of TfidfVectorizer( named as vect in Pipline later)
+		
+		> Param\_grid={ "vect\__ngram_range"=[(1,1),(1,2),(1,3)] }
+			
+	* try all combination of parameters, get optimal combination from variable 'best_estimator_'
+	
+	* set score_func to tell GridSearchCV how to select best parameters
+		* metrics.accuracy: not suitable because of our data is asymmetric
+		* metrics.f1_score: measurement according to accuracy and callback 
+			
+			> F = 2 * accuracy * callback / (accuracy + callback)
+* code 
+
+	~~~python
+	from sklearn.grid_search import GridSearchCV
+	from sklearn.metrics import f1_score
+	
+	def grid_search_model( clf_factory, X, Y):
+	    cv = ShuffleSplit( n=len(X), n_iter=10, test_size=0.3, indices=True, random_state=0)
+	    param_grid = dict( vect__ngram_range=[(1,1),(1,2),(1,3)],
+	                       vect__min_df=[1,2],
+	                       vect__stop_words=[None, "english"],
+	                       vect__smooth_idf=[False,True],
+	                       vect__use_idf=[False,True],
+	                       vect__sublinear_tf=[False,True],
+	                       vect__binary=[False,True],
+	                       classifier_alpha=[0,0.01,0.05,0.1,0.5,1],
+	                       )
+	    grid_search = GridSearchCV( 
+	    						clf_factory(), 
+	    						garam_grid=param_grid, 
+	    						cv=cv,
+	    						score_func=f1_score,
+	    						vebose=10
+	    						)
+	    grid_search.fit(X,Y)
+	    return grid_search.best_estimator_	
+	classifier = grid_search_model(create_ngram_model, X, Y)
+	# will cost several hours to try 3*2*2*2*2*2*2*6=1152 parameter combinations on 10 fold dataset
+	
+	print classifier
+	~~~
+
+	> P/R AUC is 70.2%, increased by 3.3%
+
+### Imporve Model 2 by data cleaning
+
+* use emoticons
+
+	~~~python
+	emo_repl = {
+		# positive emoticons
+		"<3" : "good",
+		":d" : "good",
+		...
+		"(:" : "good",
+		# negative emoticons
+		":/" : "bad",
+		":>" : "sad",
+		...
+		":-S": "bad",
+	}
+	~~~
+
+* replace abbreviation with non-abbreviation
+
+	~~~python
+	re_repl = {
+		r"\br\b": "are",
+		r"\bu\b": "you",
+		...
+		r"\bcan't\b": "can not",
+	}
+	~~~
+
+* add cleaning code in preprocessor
+
+	~~~python
+	def create_ngram_model(params=None):
+		def preprocessor(tweet):
+			global emoticons_replaced
+			tweet = tweet.lower()
+			for k in emo_repl_order:
+				tweet = tweet.replace(k, emo_repl[k])
+			for r, repl in re_repl.iteritems():
+				tweet = re.sub(r, repl, tweet)
+			return tweet
+	
+	tfidf_ngrams = TfidfVectorizer(preprocessor=preprocessor, analyzer="word")
+	~~~
+
+	> this time: P/R AUC is 70.7%, increased by 0.5%
+
+### Improve Model 2 by considering POS(Part Of Speech) tagging and SentiWordNet
+
+* POS(Part Of Speech) tagging 
+
+	* nltk.pos_tag(): trained from dataset in [Pennn Treebank Project](http://www.cis.upenn.edu/~treebank)
+
+	* tags: see [http://americannationalcorpus.org/OANC/penn.html](http://americannationalcorpus.org/OANC/penn.html)
+		
+	~~~python
+	import nltk
+	nltk.pos_tag(nltk.word_tokenize("This is a good book"))
+	# [('This','DT'), ('is','VBZ'),('a','DT'),('good','JJ'),('book','NN')]
+	# DT:  determiner, e.g.: 'the'
+	# VBZ:  verb, 3rd person sing. present, e.g.: 'takes'
+	# JJ: adjective, e.g.: 'green'
+	# NN: noun, singular or mass, e.g.: 'table'
+	~~~
+
+* SentiWordNet: [http://sentiwordnet.isti.cnr.it](http://sentiwordnet.isti.cnr.it)
+
+
