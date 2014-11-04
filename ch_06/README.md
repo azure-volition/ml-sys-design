@@ -374,4 +374,36 @@
 
 * SentiWordNet: [http://sentiwordnet.isti.cnr.it](http://sentiwordnet.isti.cnr.it)
 
+	> a file to store positive_score,negative_score,synonyms of a \<word, pos_tag\> pair
+	
+	> netural_score = 1 - positive_score - negative_score
 
+	> a word might have different meanings, which leads different scores and need to be processed with **word sense disambiguation**. for simplicity, we just use average scores here
+	
+	~~~python
+	import csv, collections
+	def load_sent_word_net():
+		sent_scores = collections.defaultdict(list)
+		with open(os.path.join(DATA_DIR, SentiWordNet_3.0.0_20130122.txt"), "r") as csvfile:
+			reader = csv.reader(csvfile, delimiter='\t', quotechar='"')
+			for line in reader:
+				if line[0].startswith("#"):
+					continue
+				if len(line)==1:
+					continue
+			POS,ID,PosScore,NegScore,SynsetTerms,Gloss = line
+			if len(POS)==0 or len(ID)==0:
+				continue
+			#SynsetTerms examples: fantasy#1 fantasize#1 fantasise#1
+			for term in SynsetTerms.split(" "):
+				term = term.split("#")[0]
+				term = term.replace("-", " ").replace("_", " ")
+				key  = "%s/%s" % (POS, term.split("$")[0])
+				sent_scores[key].append((float(PosScore),float(NegScore)))
+		for key, value in sent_scores.iteritems():
+			sent_scores[key] = np.mean(value, axis=0)
+	~~~
+	
+	
+	
+	
