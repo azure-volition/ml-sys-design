@@ -354,7 +354,7 @@
 
 	> this time: P/R AUC is 70.7%, increased by 0.5%
 
-### Improve Model 2 by considering POS(Part Of Speech) tagging and SentiWordNet
+### Improve Model 2 by considering POS(Part Of Speech) tagging and sentiment scores (from SentiWordNet)
 
 * POS(Part Of Speech) tagging 
 
@@ -376,7 +376,7 @@
 
 	> a file to store positive_score,negative_score,synonyms of a \<word, pos_tag\> pair
 	
-	> netural_score = 1 - positive_score - negative_score
+	> netural\_score = 1 - positive\_score - negative\_score
 
 	> a word might have different meanings, which leads different scores and need to be processed with **word sense disambiguation**. for simplicity, we just use average scores here
 	
@@ -402,8 +402,81 @@
 				sent_scores[key].append((float(PosScore),float(NegScore)))
 		for key, value in sent_scores.iteritems():
 			sent_scores[key] = np.mean(value, axis=0)
+		return sent_scores
 	~~~
 	
+* implementation: 
+
+	~~~python
+	sent_word_net = load_sent_word_net()
 	
-	
+	class LinguisticVectorizer(BaseEstimator):
+		def def_feature_names(self):
+			return numpy.array(
+				['sent_neut','sent_pos','sent_neg','nouns','adjectives'
+				,'vervbs','adverbs','allcaps','exclamation','question'
+				,'hashtag','mentioning'] )
+		def fit(self, doc, y=None):
+			# we only plan to use this function like this: fit(doc).transform(doc)
+			return self
+		def transform(self, documents):
+			# document socres
+			netural_score,positive_score,negative_score,nouns,adjectives, \
+			verbs, adverbs = numpy.array( [self._get_sentiments(doc) for doc in documents]).T
+			allcaps = []
+			exclamation = []
+			question = []
+			hashtag = []
+			mentioning = []
+			for doc in documents:
+				allcaps.append( numpy.sum( [token.issupper() for token in doc.split() if len(token)>2] ) )
+				exclamation.append( doc.count("!") )
+				question.append( doc.count("?") )
+				hashtag.append( doc.count("#") )
+				mentioning.append( doc.count("@") )
+			result = numpy.array( [netural_score, positive_score, negative_score, nouns, adjectives, verbs, adverbs, allcaps, exclamation, question, hashtag,mentioning]).T
+			
+		
+		
+		def _get_sentiments(self, doc):
+			pos_score_arr = []
+			neg_score_arr = []
+			nouns      = 0.
+			adjectives = 0.
+			verbs      = 0.
+			adverbs    = 0.
+			# analyse document
+			tagged_doc = nltk.pos_tag( tuple(doc.split() )
+			for word,tag in tagged_doc:
+				# POS(Part Of Speech) type
+				sent_pos_type = None
+				if tag.startswith("NN"):
+					sent_pos_type = "n"
+					nouns += 1
+				elif tag.startswith("JJ"):
+					sent_pos_type = "a"
+					adjectives += 1
+				elif tag.startswith("VB"):
+					sent_pos_type = "v"
+					verbs += 1
+				elif tag.startswith("RB"):
+					sent_pos_type = "r"
+					adverbs += 1
+				# positive,negative score of each word
+				pos_score,neg_score = 0,0
+				if sent_pos_type is not None:
+					sent_word = "%s/%s"%(sent_pos_type, word)
+					if sent_word in sent_word_net:
+						pos_score,neg_score = sent_word_net[sent_word]
+					pos_score_arr.append(pos_score)
+					neg_score_arr.append(neg_score)
+			# documents score
+			len = len(sent)
+			avg_pos_score   = numpy.mean(pos_vals)
+			avg_neg_score   = numpy.mean(neg_vals)
+			return [ 1 - avg_pos_score - avg_neg_score
+					 ,avg_pos_score, avg_neg_score
+					 ,nouns/1, adjectives/1, verbs/1, adverbs/1 ]
+	~~~
+
 	
