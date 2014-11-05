@@ -114,6 +114,10 @@
 	* Elastic net 
 
 	* rational
-* 
+
+* use Lasson or Elastic net in scikit-learn
+
+
+
 
 	
