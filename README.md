@@ -84,7 +84,21 @@
 
 * [Chapter 06: Classification II - Sentiment Analysis](ch_06/)
 	
-	> 
+	> Naive Bayes, divison-by-zero problem, add-on-smoothing(Laplace smoothing), mathematical underflow problem
+	
+	> Gaussian Naive Bayes, Multinomial Naive Bayes, Bernoulli Naive Bayes
+	
+	> Model 1: classify positive sentiment and negative sentiment with Multinomial Naive Bayes
+	
+	> Model 2: evaluation and the reason of bad performance
+	
+	> automatically train and test on different parameter-combinations
+	
+	> data cleaning: emoticons, abbreviations
+	
+	> considering POS(Part Of Speech) and sentimental degree of each word
+
+* [Chapter 07: Regression - Recommendations](ch_07/)
 	
 
 # packages
