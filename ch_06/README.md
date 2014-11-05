@@ -405,7 +405,7 @@
 		return sent_scores
 	~~~
 	
-* implementation: 
+* implementation: LinguisticVectorizer
 
 	~~~python
 	sent_word_net = load_sent_word_net()
@@ -479,4 +479,29 @@
 					 ,nouns/1, adjectives/1, verbs/1, adverbs/1 ]
 	~~~
 
+* combine LinguisticVectorizer into our model training:
+
+	> [FeatureUnion](http://scikit-learn.org/stable/modules/generated/sklearn.pipeline.FeatureUnion.html): applies a list of transformer objects in parallel to the input data, then concatenates the results
+	
+	~~~python
+	def create_union_model(params=None):
+		def preprocessor(tweet):
+			tweet = tweet.lower()
+			for k in emo_repl_order:
+				tweet = tweet.replace( k, emo_repl[k] )
+			for r, repl in re_repl.iteritems():
+				tweet = re.sub(r, repl, tweet)
+			return tweet.replace("-"," ").replace("_", " ")
+		
+		tfidf_ngrams = TfidfVectorizer(preprocessor=preprocessor, analyzer="word" )
+		ling_stats = LinguisticVectorizer()
+		all_features = FeatureUnion( [('ling', ling_stats), ('tfidf', tfidf_ngrams)])
+		classifier = MultinomialNB()
+		pipeline = Pipeline( [('all',all_features), ('classifier', classifier)])
+		if params:
+			pipeline.set_params(**params)
+		return pipeline
+	~~~
+	
+	> we get a 0.6% increase on P/R AUC
 	
