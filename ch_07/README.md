@@ -187,11 +187,63 @@
 		
 		* 80% data for training model and penalty parameter
 		
-			> divide these 80% data into 5 group
+			> layer 2:
+		
+			> break these 80% data into 5 subfolds to try different penalty
 			
-			> 16%: 
+			> on each sub-fold (16% data): a sub 5-fold-training-testing is executed
+			
+			* 12.8% (16%*80%) : for training
+			* 3.2% (16%*20%) : for cross validation
+			
+			> once the optimal penatly is found, cross-validating is execute on layer2's testing fold
+	
+	* run two-layer cross validation with ElasticNetCV/LassoCV/RigeCV:
+		
+		> e.g.: ElasticNetCV
+		
+		~~~python
+		from sklearn.linear_model import ElasticNetCV
+		model_training = ElasticNetCV(fit_intercept=True)
+		k_fold         = KFold(len(target), n_folds=10)
+		total_err      = 0
+		for train_set, test_set in k_fold:
+			model_training.fit(data[train], target[train])
+			predict_arr = map( model_training.predict, data[test] )
+			predict_arr = numpy.array(predict_arr).ravel()
+			error_arr   = predict_arr - target[test]
+			total_err  += numpy.dot(error_arr, error_arr)
+		rmse_k_cv = numpy.sqrt( total_err / len(target) )
+		~~~
+		
+		> ... will run for quit a long time
+		
+### Rating prediction and recommendation
 
+* problem: Netflix Challenge
 
+	> user rate on movies (score is one of 1,2,3,4 and 5)
+	
+	> recomend other movies according user's rating and watching history
+	
+	* winners' solutions:
+	
+		> combining advanced machine learning algorithms
+	
+		> a lot of preprocess are needed, such as:
+		
+		* some users tend to rating high, others tend to rating a lower score
+		
+		* rating count received and release time
+
+* classification or regression? 
+
+	> classification is not suitable:
+	
+	* severity of errors are different between rating 5 to 4 and rating 5 to 1
+
+	* middle value are useful, such as 4.7 is different from 4.2
+	
 
 	
 
