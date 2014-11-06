@@ -112,12 +112,87 @@
 		> b<sup>*</sup> = arg min<sub>b</sub> (Y - X&dot;b)<sup>2</sup> + &lambda; &sum;b<sub>i</sub><sup>2</sup>
 
 	* Elastic net 
+	
+		> combining Lasso and Ridge, which uses both penalties
 
-	* rational
-
+	* These penalties will makes b<sub>i</sub> smaller.  More b<sub>i</sub> will become zero, which automatically discard some features and makes the model sparse.  The feature selections is integrated into model training.
+	
+	* penalty pameter: &lambda;
+		
+		> The smaller &lambda; is, the smaller penalty we get.  When &lambda nearly equal to 0, our model will be similar with OLS. 
+	
 * use Lasson or Elastic net in scikit-learn
 
+	~~~python
+	from sklearn.linear_model import ElasticNet
+	en = ElasticNet(fit_intercept=True, alpha=0.5)
+	~~~
+	
+	> training error increases to 5.0 from 4.6, but cross validation error drops to 5.4 from 5.6
+	
+### Regression when feature count larger than example count (P>N)
+
+* Problem:
+
+	> fit perfectly on training set, but generalize bad on testing set
+	
+	> e.g.: regard every word as a feature, thus feature count is extreme large
+	
+* Example: predict stocks fluctuation from 10-K reports of SEC
+
+	> load training data: 16087 examples, 150360 features
+	
+	~~~python
+	from sklearn.datasets import load_svmlight_file
+	data,target = load_svmlight_file( 'E2006.train' )
+	
+	print('Min target value:{}'.format(target.min()))   # -7.89957807347
+	print('Max target value:{}'.format(target.max()))   # -0.51940952695
+	print('Mean target value:{}'.format(target.mean())) # -3.51405313669
+	print('Std. dev. target:{}'.format(target.std()))   # 0.632278353911
+	~~~
+	
+	> train model with OLS and evaluate performance
+	
+	~~~python
+	from sklearn.linear_model import LinearRegression
+	lr = LinearRegression(fit_intercept=True)
+	lr.fit(data, target)
+	predict_arr    = numpy.array( map( lr.predict, data ) ) # (1,16087) array
+	predict_arr    = predict_arr.ravel() 
+	error_arr      = predict_arr - target
+	total_sq_error = numpy.sum( error_arr * error_arr )     # sum(dot product)
+	rmse_train     = numpy.sqrt( total_sq_error/len(predict_arr) )
+	print(rmse_train)
+	~~~
+	
+	> training error is 0.0025 (extremly small)
+	> but cross validating error is 0.78 (larger than standard deviation 0.632278353911, worse than always predict average value -3.51405313669)
+	
+* Solution: use normalization to prevent overfitting
+
+	> e.g.: use Elastic Net with penalty parameter of 1, RMSE of 0.4 can be got from cross validation
+
+	> panalty parameter should be selected carefully (overfit if too large, underfit if too small)
+	
+* **Hyperparameter: find optimal penalty parameter by training**
+
+	* two-layer cross validation
+
+		> e.g.: two-layer 5-fold cross validation
+		
+		> layer 1: split all data into 5 folds
+		
+		* 20% data for evaluation the generalization ability (test error)
+		
+		* 80% data for training model and penalty parameter
+		
+			> divide these 80% data into 5 group
+			
+			> 16%: 
 
 
+
+	
 
 	
