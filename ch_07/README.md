@@ -244,7 +244,49 @@
 
 	* middle value are useful, such as 4.7 is different from 4.2
 
+* movie-specific model or user-specific model? 
 	
+	> just try user-specific model first, movie-specific model will be discussed later
+	
+* regression with LassoCV (two-layer cross validation)
+
+	~~~
+	from sklearn.linear_model import LassoCV
+	import numpy as np
+	
+	# alapha parameter in second layer cross validation are .125, .25, ..., 4.
+	regression = LassoCV(fit_intercept=True, alphas=[.125,.25,.5,1.,2.,4.])
+	
+	def learn_for_user(i):
+		u   = reviews[i] # movie reviews of user i
+		us  = np.delete(np.arange(reviews.shape[0]),i) # [0,1,...,i-1,i+1,...N]
+		# x: reviews from other users of movies which user i has scored
+		ps, = np.where(u.toarray().ravel() > 0)
+		x = reviews[us][:,ps].T
+		# y: reviews of user i
+		y = u.data d
+		# train model and cross validate
+		err = 0
+		eb  = 0
+		kf  = KFold(len(y), n_folds=4)
+		for train,test in kf:
+			xc,x1 = movie_norm(x[train])
+			reg.fit(xc, y[train]-x1)
+			xc,x1 = movie_norm(x[test])
+			p = np.array([reg.predict(xi) for xi in  xc]).ravel()
+			e = (p+x1)-y[test]
+			err += np.sum(e*e)
+			eb += np.sum( (y[train].mean() - y[test])**2 )
+		return np.sqrt(err/float(len(y))), np.sqrt(eb/float(len(y)))
+	
+	def movie_norm(xc):
+		xc = xc.copy().toarray()             # sparse to dense
+		x1 = np.array([xi[xi > 0].mean() for xi in xc]) # ignore 0
+		x1 = np.nan_to_num(x1)               # NaN(not rated) to 0
+		for i in range(xc.shape[0]):
+		    xc[i] -= (xc[i] > 0) * x1[i]     # non-zero-item - mean
+		return xc, x1
+	~~~
 	
 
 	
