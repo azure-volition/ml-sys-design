@@ -125,12 +125,9 @@
 	> long tail phenomenon: 33% items are saled less than 4 times, which accounts 1% purchase
 
 * implementation of Apriori (Rakesh Agrawal and Ramakrishnan Srikant, 1994)
+	
+	> skipped
 
-	> for demonstration
-	
-	> [apriori_naive.py](./apriori_naive.py)
-	
-	
 	
 
 	
