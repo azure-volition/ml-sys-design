@@ -1,6 +1,16 @@
 ## CH08 Regression - Recommendations Improved
 
-### New ideas besides Chapter 07
+### New ideas
+
+* Only considering whether a user has rated a move
+	
+	> use binary matrix to store the data:
+	
+	~~~python
+	from matplotlib import pyplot as plt
+	imagedata = reviews[:200, :200].todense()
+	plt.imshow(imagedata, interpolation='nearest')
+	~~~
 
 * recomendation with correlated users
 
@@ -89,5 +99,47 @@
 	~~~
 	
 ### **basket analysis**
+
+* basket analysis
+	
+	> consider which items tends to be bought together with higher probability **compared to the benchmark**
+	
+	> *without comparation with the benchmark, unrelated items might be remomended incorrectly simply because they are popular*
+
+* load data and analyse
+
+	~~~python
+	from collections import defaultdict
+	from itertools import chain
+	
+	# a sale record for each line, such as: item_id_1 item_id_2 ... item_id_n
+	item_sale_rec = [
+		[int(tok) for tok in line.strip().split()] for line in open('retail.dat')
+	]
+	
+	sale_cnt = defaultdict(int)
+	for item_id in chain(*item_sale_rec):
+		sale_cnt[item_id] +=1
+	~~~
+	
+	> long tail phenomenon: 33% items are saled less than 4 times, which accounts 1% purchase
+
+* implementation of Apriori (Rakesh Agrawal and Ramakrishnan Srikant, 1994)
+
+	> for demonstration
+	
+	> [apriori_naive.py](./apriori_naive.py)
+	
+	
+	
+
+	
+
+
+
+
+
+	
+	
 	
 	
