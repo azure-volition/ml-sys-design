@@ -32,7 +32,7 @@
 	
 * [Chapter 02: Learning How to Classify with Real-world Examples](ch_02/)
 
-	> underfitting and overfitting
+	> underfitting and overfitting, cross validation
 	
 	> adjust loss function according to the cost of False Positive and False Negative
 	
@@ -50,7 +50,7 @@
 	
 	> advantages and disadvantages of bag-of-words
 	
-	> generate feature vectors: min_df, max_df, token_pattern, normalize, remove stop-words, use word-stem, select most important words according to TF-IDF
+	> generate feature vectors: min\_df, max\_df, token\_pattern, normalize, remove stop-words, use word-stem, select most important words according to TF-IDF
 	
 	> clustering with K-Means
 	

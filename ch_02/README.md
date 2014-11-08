@@ -21,7 +21,7 @@ Iris types: Iris Setosa, Iris Versicolor, Iris Virginica
 
 1. underfitting V.S overfitting, training error V.S testing error
 2. cross-validation: 
-  * leave-on-out validation: cost too much
+  * leave-one-out validation: cost too much
   * n-fold validation: data distribution should be balanced when generating folds
   * False Positive, False Negative and using different cost function according cost of each error type.
 

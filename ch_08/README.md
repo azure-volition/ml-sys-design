@@ -1,27 +1,93 @@
 ## CH08 Regression - Recommendations Improved
 
-### Ideas
+### New ideas besides Chapter 07
 
-> **basket analysis**: only considering whether a user has rated a move
+* recomendation with correlated users
 
-> use binary matrix to store the data:
+	> for each user: sort other users according to samilarity with this user
 
-~~~python
-from matplotlib import pyplot as plt
-imagedata = reviews[:200, :200].todense()
-plt.imshow(imagedata, interpolation='nearest')
-~~~
+	> on predicting a user-movie rating: return rating-score of the most similar user who has scored this movie
 
-> recomendation with user model:
-
-* for each user: sort other users according to samilarity to this user
-
-* on predicting a user-movie rating: scan the users array, return rating-score of 1st user who scored this movei
-
-* performance: 
+	> performance: 
 	* RMSE reduce by 20% compared with using avarage rating of all users
 	* RESE reduce by 25% if only using data of users who frequently(top 50%) rate movies
 
-> recomendation with movie model:
+* recomendation with movie model
 
-> combining these two approaches 
+	> for each movie: sort other movies according to samilarity with this movie
+
+	> on predicting a user-movie rating: return rating-score of the most similar movie this user has scored
+
+	* RMSE: 0.85
+
+* ensemble learning
+
+* basket analysis
+
+### **Ensemble learning**
+
+* **ensemble multiple models together and learn weight of each model:**
+
+	> model 1 : [similar_movie](./similar_movie.py)
+	
+	> model 2 : [corrneighbors](./corrneighbors.py)
+	
+	> model 3 : [usermodel](./user_model.py)  (introduced in last Chapter)
+	
+	> **regard output of sub-models as features**
+	
+	~~~python
+	import similar_movie
+	import corrneighbors
+	import usermodel
+	from sklearn.linear_model import LinearRegression
+	...
+	
+	# 3 sub-models
+	estimate = [
+		usermodel.all_estimate(),     
+		corrneighbors.all_estimate(),
+		similar_movie.all_estimate()
+		# *.all_estimate()[u,m]: predicated rating of user u on movie m
+	] 
+	# parameter of each sub-model
+	coefficients = []
+	...
+	
+	# leave-one-out validation
+	for uid in xrange( reviews.shape[0] ): # for all users
+		# remove uid
+		est_other_users = numpy.delete( estimate, uid, 1 ) # dim0: model, dim 1:user, dim2: movie)
+		rev_other_users = numpy.delete(  reviews, uid, 0 ) # dim0: user; dim1: movie
+		# coordinates
+		pos_x, pos_y = numpy.where( rev_other_users > 0 ) # only scored [u,m]
+		# training set
+		X = est_other_users[:,pos_x,pos_y]  # not 'estimate' as in book?
+		Y = rev_other_users[rev_other_users>0]
+		# train coefficients
+		regression.fit(X.T, Y)
+		coefficients.append(reg.conf_)
+	
+	# predicate
+	predication = regression.predict( estimate[:, uid, reviews[uid]>0].T )
+	print coefficients.mean(0)
+	# [ 0.25164062, 0.01258986, 0.60827019 ]
+	~~~
+	
+	> RMSE is almost equal to 1, and from coefficients.mean(0) we know contribution of corrneighbors.all_estimate() is quite limited
+	
+* ensemble models with multiple parameters
+
+	~~~python	
+	estimate = [
+		usermodel.all_estimate_all,
+		similar_movie.estimate_all(k=1),
+		similar_movie.estimate_all(k=2),
+		similar_movie.estimate_all(k=3),
+		similar_movie.estimate_all(k=4),
+		similar_movie.estimate_all(k=5),
+	~~~
+	
+### **basket analysis**
+	
+	
