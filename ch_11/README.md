@@ -36,6 +36,10 @@
 
 * **FILTER: discover feature dependancy based on statistics**
 
+	* Workflow
+
+		all features -> **remove redudant features** -> features for training (X:Y) -> **remove irrelevant features** -> resulting features
+
 	* Pearson Correlation Coefficient
 	
 		* usage: find linear dependency between features
@@ -86,7 +90,10 @@
 			
 			> **NI(X;Y)=I(X;Y)/(H(X)+H(Y))**
 		
-		* **drawback: very slow to compute when feature number is large**
+		* **drawback: very slow to compute because every pair of features will be calculated**
+	
+	* **drawback of FILTER**: may errorly remove irrelevant features (see workflow) when statistic dependancy with labels(Y). 
+	> A single feature(X[i]) might be irrelevant with labels(Y), but when combined with other feature(X[j],...) it might demonstrate strong dependency with labels(Y), e.g.: Y = X[0] xor X[1]
 
 * **WRAPER: voting by model itself to discover feature dependancy hiden from FILTER**
 		 
